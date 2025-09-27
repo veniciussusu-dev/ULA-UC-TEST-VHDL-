@@ -1,0 +1,78 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+entity mux is
+
+Port( 
+  
+i1: in std_logic_vector ( 7 downto 0);
+i2: in std_logic_vector ( 7 downto 0);
+sel : in	std_logic;
+saida: out std_logic_vector(7 downto 0)
+  
+);
+
+END mux;
+
+ARCHITECTURE opcode of mux is
+begin
+ with sel SELECT
+	saida <= i1 when '0',
+	saida <= i2 when '1',
+	(others => 'X') when others;
+
+end opcode;
+
+
+entity CONEXAO_MUX_ULA is
+    Port (
+        -- Entradas para o MUX (aqui atuando como UC)
+        INSTRUCAO_ADD : in STD_LOGIC_VECTOR(7 downto 0) := "00000001"; -- Opcode ADD em 8 bits
+        INSTRUCAO_SUB : in STD_LOGIC_VECTOR(7 downto 0) := "00000010"; -- Opcode SUB em 8 bits
+       
+        SELETOR_MUX   : in STD_LOGIC;                                  -- Escolhe ADD ou SUB
+        
+        -- Entradas de Dados para a ULA
+        OPERANDO_A    : in STD_LOGIC_VECTOR(7 downto 0);
+        OPERANDO_B    : in STD_LOGIC_VECTOR(7 downto 0);
+        
+        -- Saída de Resultado
+        RESULTADO_OUT : out STD_LOGIC_VECTOR(7 downto 0);
+          CARRY_OUT     : out STD_LOGIC
+    );
+END CONEXAO_MUX_ULA;
+
+ARCHITECTURE ligacao of CONEXAO_MUX_ULA is
+    
+    -- Sinal interno para a saída do MUX (8 bits)
+    signal s_saida_mux : STD_LOGIC_VECTOR(7 downto 0); 
+    
+    -- Sinal de 4 bits para o OPCODE da ULA
+    signal s_opcode_ula : STD_LOGIC_VECTOR(7 downto 0); 
+
+begin
+
+  
+    s_opcode_ula <= s_saida_mux(7 downto 0); 
+    
+    -- 1. INSTANCIAÇÃO MUX (ATUANDO COMO UC)
+    UC_MUX_i : entity work.mux
+        port map (
+            i1    => INSTRUCAO_ADD,
+            i2 => INSTRUCAO_SUB,
+            sel   => SELETOR_MUX,
+            saida => s_saida_mux
+        );
+
+    -- 2. INSTANCIAÇÃO DA ULA  -- Usando a ULA
+    ULA_i : entity work.ULA
+        port map (
+            a         => OPERANDO_A,
+            b         => OPERANDO_B,
+            opcode    => s_opcode_ula,      -- Recebe o opcode de 4 bits do
+            c_in    => '0',
+            soma => RESULTADO_OUT,
+            c_out    => CARRY_OUT 
+        );
+
+end architecture ligacao;
