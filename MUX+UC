@@ -18,8 +18,8 @@ ARCHITECTURE opcode of mux is
 begin
  with sel SELECT
 	saida <= i1 when '0',
-	saida <= i2 when '1',
-	(others => 'X') when others;
+	         i2 when '1',
+	        (others => 'X') when others;
 
 end opcode;
 
