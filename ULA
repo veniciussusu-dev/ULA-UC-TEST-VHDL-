@@ -1,0 +1,59 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+
+entity ULA is
+
+Port( 
+  
+a : in std_logic_vector(7 downto 0);
+b : in std_logic_vector(7 downto 0);
+opcode : in std_logic_vector(7 downto 0);
+soma : out std_logic_vector(7 downto 0);
+c_out : out std_logic;	
+c_in : in std_logic
+     
+);
+
+END ULA;
+
+architecture RTL of ULA is
+    -- Sinal interno para guardar o resultado da soma de A e B
+signal sum_result : unsigned(8 downto 0); -- 9 bits para incluir o carry de 
+signal sub_result : unsigned(8 downto 0);     
+begin
+    
+    -- Lógica da Soma (usando tipos UNIDADE para somar, com C_IN incluso)
+    -- O 'std_logic' C_IN é concatenado como o bit mais significativo para inclusão na soma.
+    sum_result <= ('0' & unsigned(A)) + unsigned(B) + ('0' & '0' & '0' & '0' & '0' & '0' & '0' & c_in);
+  -- Lógica da SUBTRAÇÃO: A + not(B) + C_IN (Complemento de Dois)
+    sub_result <= ('0' & unsigned(A)) + (not unsigned(B)) + ('0' & '0' & '0' & '0' & '0' & '0' & '0' & C_IN);
+  
+-- Um processo que usa o OPCODE para decidir qual resultado enviar para a saída.
+  
+  process(a, b, opcode,c_in)
+  begin
+  
+   soma <= (others => '0'); 
+        C_OUT <= '0'; 
+        
+    case opcode is
+      when "00000001" => soma <=std_logic_vector(s_sum_result(7 downto 0));
+     c_out <= s_sum_result(8); -- bit mais significativo
+      
+       -- Aqui é onde adicionaria futuras operações:
+       
+  when "00000010" => soma <= std_logic_vector(sub_result(7 downto 0));
+                C_OUT <= sub_result(8); -- Bit de Borrow Out (Indica ausência de borrow se for '1')
+  		
+  
+ when others => soma <= (others => '0');
+                -- NOP (Resultado zero para opcodes não definidos)
+           
+               c_out<= '0';
+        end case;
+    end process; 
+  
+  
+  
+end ARCHITECTURE RTL;
