@@ -1,0 +1,83 @@
+-- Code your testbench here
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+
+entity test is
+end test;
+
+architecture behavioral of test is
+
+component CONEXAO_MUX_ULA 
+port(
+-- Entradas para o MUX (aqui atuando como UC)
+        INSTRUCAO_ADD : in STD_LOGIC_VECTOR(7 downto 0) := "00000001"; -- Opcode ADD em 8 bits
+        INSTRUCAO_SUB : in STD_LOGIC_VECTOR(7 downto 0) := "00000010"; -- Opcode SUB em 8 bits
+        SELETOR_MUX   : in STD_LOGIC;                                  -- Escolhe ADD ou SUB
+        
+        -- Entradas de Dados para a ULA
+        OPERANDO_A    : in STD_LOGIC_VECTOR(7 downto 0);
+        OPERANDO_B    : in STD_LOGIC_VECTOR(7 downto 0);
+        
+        -- Saída de Resultado
+        RESULTADO_OUT : out STD_LOGIC_VECTOR(7 downto 0);
+          CARRY_OUT     : out STD_LOGIC
+  )  ;
+  
+  end component;
+  
+  
+  signal s_instrucao_add : std_logic_vector (7 downto 0):= "00000001";
+  
+  signal s_instrucao_sub : std_logic_vector (7 downto 0):= "00000001";
+  signal s_seletor_mux   : STD_LOGIC := '0';
+  signal s_operando_a    : STD_LOGIC_VECTOR(7 downto 0) := (others => '0');
+  signal s_operando_b    : STD_LOGIC_VECTOR(7 downto 0) := (others => '0');
+  signal s_resultado_out : STD_LOGIC_VECTOR(7 downto 0);
+  signal s_carry_out     : STD_LOGIC;
+
+   constant T_DELAY : time := 10 ns;
+   
+   begin
+   
+   UUT : entity work.CONEXAO_MUX_ULA
+   PORT MAP(
+   
+   INSTRUCAO_ADD => s_instrucao_add,
+   INSTRUCAO_SUB => s_instrucao_sub,
+   SELETOR_MUX   => s_seletor_mux,
+   OPERANDO_A    => s_operando_a,
+   OPERANDO_B    => s_operando_b,
+   RESULTADO_OUT => s_resultado_out,
+   CARRY_OUT     => s_carry_out
+        );
+  
+  
+  
+  process
+  
+  begin
+  
+  s_seletor_mux <= '0';
+  s_operando_a <= (others => '0');
+  s_operando_b <= (others => '0');
+  wait for T_DELAY;
+  
+  
+  s_seletor_mux <= '0';
+  s_operando_a <= "00000101"; -- A = 5
+  s_operando_b <= "00000010"; -- B = 2
+  wait for T_DELAY;
+  
+  
+  s_seletor_mux <= '1';
+  s_operando_a <= "00000101"; -- A = 5
+  s_operando_b <= "00000010"; -- B = 2
+  wait for T_DELAY;
+  
+  
+  
+        wait; -- Fim da simulação
+    end process;
+
+end architecture behavioral;
