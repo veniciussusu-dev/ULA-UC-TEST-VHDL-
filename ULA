@@ -38,7 +38,7 @@ begin
         C_OUT <= '0'; 
         
     case opcode is
-      when "00000001" => soma <=std_logic_vector(s_sum_result(7 downto 0));
+      when "00000001" => soma <=std_logic_vector(sum_result(7 downto 0));
      c_out <= s_sum_result(8); -- bit mais significativo
       
        -- Aqui é onde adicionaria futuras operações:
